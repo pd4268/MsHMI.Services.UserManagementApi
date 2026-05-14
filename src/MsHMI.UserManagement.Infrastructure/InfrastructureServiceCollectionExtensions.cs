@@ -29,7 +29,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddHttpClient<OracleGatewayClient>((sp, client) =>
         {
             var gatewayUrl = configuration.GetValue<string>("OracleGateway:BaseUrl") 
-                ?? "http://oracle-gateway:8081";
+                ?? "http://ms-oracle-gateway";
             client.BaseAddress = new Uri(gatewayUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });

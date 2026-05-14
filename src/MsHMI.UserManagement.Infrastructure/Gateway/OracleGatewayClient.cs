@@ -11,7 +11,7 @@ namespace MsHMI.UserManagement.Infrastructure.Gateway;
 /// </summary>
 public class OracleGatewayOptions
 {
-    public string BaseUrl { get; set; } = "http://oracle-gateway:8081";
+    public string BaseUrl { get; set; } = "http://ms-oracle-gateway";
 }
 
 /// <summary>
