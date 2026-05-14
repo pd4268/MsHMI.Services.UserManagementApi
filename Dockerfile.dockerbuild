@@ -1,0 +1,36 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy project files first to maximize layer cache
+COPY src/MsHMI.UserManagement.Api/MsHMI.UserManagement.Api.csproj src/MsHMI.UserManagement.Api/
+COPY src/MsHMI.UserManagement.Infrastructure/MsHMI.UserManagement.Infrastructure.csproj src/MsHMI.UserManagement.Infrastructure/
+COPY src/MsHMI.UserManagement.Core/MsHMI.UserManagement.Core.csproj src/MsHMI.UserManagement.Core/
+COPY src/MsHMI.Common.Auth/MsHMI.Common.Auth.csproj src/MsHMI.Common.Auth/
+
+RUN dotnet restore src/MsHMI.UserManagement.Api/MsHMI.UserManagement.Api.csproj
+
+# Copy the rest of the source
+COPY src/ src/
+
+RUN dotnet publish src/MsHMI.UserManagement.Api/MsHMI.UserManagement.Api.csproj -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Required for HEALTHCHECK
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV ASPNETCORE_URLS=http://0.0.0.0:80
+
+COPY --from=build /app/publish .
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD curl -fsS http://localhost/health || exit 1
+
+ENTRYPOINT ["dotnet", "MsHMI.UserManagement.Api.dll"]
