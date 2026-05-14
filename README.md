@@ -9,16 +9,16 @@ ASP.NET Core (.NET 8) API for MsHMI User Management.
 
 ## Container
 
-Build (recommended in this environment):
+Build (from repo root):
+
+```bash
+docker build -t mshmi-user-management-api:local .
+```
+
+If your Docker environment cannot reach NuGet, you can still build by publishing on the host first:
 
 ```bash
 ./build-image.sh mshmi-user-management-api:local
-```
-
-Alternative (build inside Docker):
-
-```bash
-docker build -f Dockerfile.dockerbuild -t mshmi-user-management-api:local .
 ```
 
 Run (example):
